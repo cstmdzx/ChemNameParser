@@ -45,8 +45,8 @@ for eachLine in allChemForm:
                 html = gethtml(eachChemFormHtml)
                 html = html.decode("gbk")
             except:
-                print('爬不到网站')
-                exit(0)
+                print('爬不到化学式')
+                continue
             # 处理name
             chemNameMatch = patternGetChemName.search(html)
             print(chemNameMatch)
