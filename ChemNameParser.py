@@ -4,6 +4,7 @@ import string
 import urllib.parse
 import urllib.request
 import re
+import time
 
 
 def gethtml(url):
@@ -19,9 +20,12 @@ patternGetChemStructure = re.compile(r'Chemical structure:</strong> <img src="(.
 patternSearch = re.compile(r'<li><a href="(.+)">')
 
 fileRDF = open('chemistry.n3', 'a')
-fileChemForm = open('formula.txt', 'r')
+fileChemForm = open('formula2.txt', 'r')
 fileError = open('error.txt', 'w')
 allChemForm = fileChemForm.readlines()
+
+errorNum = 0
+count = 0
 
 for eachLine in allChemForm:
     # 先从文档中拿一个关键词出来
@@ -32,9 +36,10 @@ for eachLine in allChemForm:
         resultForm = resultForm.decode('gbk')
     except:
         print('爬不到网站')
-        exit(0)
+        time.sleep(60)
     findallChemForm = patternSearch.findall(resultForm)  # 这个关键词的搜索结果
     if findallChemForm.__len__() == 0:  # 代表没有结果
+        errorNum += 1
         continue
     if findallChemForm.__len__() == 1:  # 代表只有一个结果,还没想好怎么处理
         continue
@@ -46,6 +51,7 @@ for eachLine in allChemForm:
                 html = html.decode("gbk")
             except:
                 print('爬不到化学式')
+                # time.sleep(10)
                 continue
             # 处理name
             chemNameMatch = patternGetChemName.search(html)
@@ -86,6 +92,9 @@ for eachLine in allChemForm:
                 print(chemStructure)
                 fileRDF.write(chemName + '  ' + '<http://edukb.org/knowledge/0.1/property/chemistry#StructureType>' + '  ' + '<' + chemStructure + '>' + '\n')
             fileRDF.write('\n')
+            count += 1
 fileRDF.close()
 fileChemForm.close()
 fileError.close()
+print(count)
+print(errorNum)
