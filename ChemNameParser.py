@@ -9,6 +9,7 @@ import time
 
 def gethtml(url):
     page = urllib.request.urlopen(url)
+
     url2 = page.read()
     return url2
 
