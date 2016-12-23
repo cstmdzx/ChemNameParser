@@ -39,8 +39,51 @@ for eachLine in allChemForm:
         print('爬不到网站')
         time.sleep(60)
     findallChemForm = patternSearch.findall(resultForm)  # 这个关键词的搜索结果
-    if findallChemForm.__len__() == 0:  # 代表没有结果
-        errorNum += 1
+
+    if findallChemForm.__len__() == 0:  # 代表没有结果 或者只有一个结果被重定向了
+        html = resultForm
+        # 处理name
+        chemNameMatch = patternGetChemName.search(html)
+        print(chemNameMatch)
+        if chemNameMatch:
+            chemName = chemNameMatch.group(1)
+        else:
+            fileError.write('X\n')
+            errorNum += 1
+            continue
+            # 证明是没有结果，或者这个页面爬错了,
+
+        # 处理分子式
+        chemFormulaMatch = patternGetChemFormula.search(html)
+        if chemFormulaMatch:
+            chemFormula = chemFormulaMatch.group(1)
+            chemFormula = chemFormula.replace("<sub>", "")
+            chemFormula = chemFormula.replace("</sub>", "")
+            chemFormula = chemFormula.replace(" ", "")
+            print(chemFormula)
+            fileRDF.write(chemName + '  ' + '<http://edukb.org/knowledge/0.1/property/chemistry#ChemicalFormula>' +
+                          '  ' + chemFormula + '\n')
+
+        # 处理相对分子质量
+        chemMolecularWeightMatch = patternGetMolecularWeight.search(html)
+        if chemMolecularWeightMatch:
+            chemMolecularWeight = chemMolecularWeightMatch.group(1)
+            chemMolecularWeight = chemMolecularWeight.replace(" ", "")
+            print(chemMolecularWeight)
+            fileRDF.write(chemName + '  ' +
+                          '<http://edukb.org/knowledge/0.1/property/chemistry#RelativeMolecularMass>' +
+                          '  ' + chemMolecularWeight + '\n')
+
+        # 处理结构式
+        chemStructureMatch = patternGetChemStructure.search(html)
+        if chemStructureMatch:
+            chemStructure = chemStructureMatch.group(1)
+            chemStructure = 'http://webbook.nist.gov/' + chemStructure
+            print(chemStructure)
+            fileRDF.write(
+                chemName + '  ' + '<http://edukb.org/knowledge/0.1/property/chemistry#StructureType>' + '  ' + '<' + chemStructure + '>' + '\n')
+        fileRDF.write('\n')
+        count += 1
         continue
     if findallChemForm.__len__() == 1:  # 代表只有一个结果,还没想好怎么处理
         continue

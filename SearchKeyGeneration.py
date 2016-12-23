@@ -2,8 +2,8 @@
 # 生成一系列查询用的关键词
 # author = 'nklyp'
 
-fileForm = open('formula2.txt', 'a')
-for cn in range(1, 50):
+fileForm = open('formula3.txt', 'a')
+for cn in range(50, 100):
     # 检索词生成，主要涉及烷烃，以及加入氧原子，氯原子，溴原子的化学式
     # 同时考虑一下包含两种的情况
     for hn in range(2, (2 * cn + 3)):
